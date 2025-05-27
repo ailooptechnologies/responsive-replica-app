@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -50,7 +49,6 @@ const Register = () => {
           <div className="text-center">
             <div className="text-3xl font-bold mb-2">
               <span className="text-black">ERP</span>
-              <span className="text-primary">GO</span>
             </div>
             <p className="text-sm text-gray-500">Powered by WORKDO</p>
           </div>
@@ -127,7 +125,7 @@ const Register = () => {
           </Card>
 
           <div className="text-center text-sm text-gray-500">
-            Copyright ERPGO 2025
+            Copyright ERP 2025
           </div>
         </div>
       </div>

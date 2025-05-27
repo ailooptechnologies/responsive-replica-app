@@ -46,15 +46,13 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
-  const { state } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
 
-  const isCollapsed = state === "collapsed";
   const isActive = (path: string) => currentPath === path || (path === "/dashboard" && currentPath === "/");
 
   return (
-    <Sidebar className="w-64 bg-white border-r border-gray-200" collapsible="offcanvas">
+    <Sidebar className="w-64 bg-white border-r border-gray-200" collapsible="none">
       <SidebarContent className="p-4">
         <SidebarGroup>
           <SidebarGroupContent>
