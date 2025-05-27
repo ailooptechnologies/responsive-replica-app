@@ -33,7 +33,6 @@ const ForgotPassword = () => {
           <div className="text-3xl font-bold mb-2">
             <span className="text-black">ERP</span>
           </div>
-          <p className="text-sm text-gray-500">Powered by WORKDO</p>
         </div>
 
         <Card className="shadow-lg">

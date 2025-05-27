@@ -26,7 +26,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar";
 
 const menuItems = [
@@ -59,11 +58,11 @@ export function AppSidebar() {
             <SidebarMenu className="space-y-2">
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title} className="w-full">
-                  <SidebarMenuButton asChild className="w-full p-0">
+                  <SidebarMenuButton asChild className="w-full p-0 h-auto">
                     <NavLink
                       to={item.url}
                       className={({ isActive: navIsActive }) =>
-                        `flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group w-full text-left ${
+                        `flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200 group w-full text-left ${
                           isActive(item.url) || navIsActive
                             ? "bg-primary text-white shadow-md"
                             : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"

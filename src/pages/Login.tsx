@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -18,7 +19,7 @@ const Login = () => {
     if (formData.email && formData.password) {
       toast({
         title: "Login Successful",
-        description: "Welcome to ERPGO!",
+        description: "Welcome to ERP!",
       });
       navigate("/dashboard");
     } else {
@@ -39,7 +40,6 @@ const Login = () => {
             <div className="text-3xl font-bold mb-2">
               <span className="text-black">ERP</span>
             </div>
-            <p className="text-sm text-gray-500">Powered by WORKDO</p>
           </div>
 
           <Card className="shadow-lg">

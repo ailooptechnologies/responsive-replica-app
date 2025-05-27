@@ -86,7 +86,6 @@ const Layout = ({ children }: LayoutProps) => {
               <div className="text-2xl font-bold">
                 <span className="text-black">ERP</span>
               </div>
-              <span className="text-xs text-gray-500 hidden sm:block">Powered by WORKDO</span>
             </div>
           </div>
 
