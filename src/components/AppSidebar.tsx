@@ -54,21 +54,21 @@ export function AppSidebar() {
   const isActive = (path: string) => currentPath === path || (path === "/dashboard" && currentPath === "/");
 
   return (
-    <Sidebar className="w-64 bg-white border-r border-gray-200" collapsible="none">
+    <Sidebar className="w-64 bg-white border-r border-gray-200" collapsible="offcanvas">
       <SidebarContent className="p-4">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-2">
               {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                <SidebarMenuItem key={item.title} className="w-full">
+                  <SidebarMenuButton asChild className="w-full p-0">
                     <NavLink
                       to={item.url}
                       className={({ isActive: navIsActive }) =>
-                        `flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group w-full ${
+                        `flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group w-full text-left ${
                           isActive(item.url) || navIsActive
                             ? "bg-primary text-white shadow-md"
-                            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                            : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                         }`
                       }
                     >

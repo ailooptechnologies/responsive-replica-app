@@ -102,7 +102,7 @@ const Login = () => {
       </div>
 
       {/* Right side - Illustration */}
-      <div className="hidden lg:flex flex-1 green-gradient items-center justify-center text-white p-8">
+      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-green-400 to-green-600 items-center justify-center text-white p-8">
         <div className="text-center space-y-6">
           <div className="space-y-4">
             <h2 className="text-4xl font-bold">"Attention is the new currency"</h2>
