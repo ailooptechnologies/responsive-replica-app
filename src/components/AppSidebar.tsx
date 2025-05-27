@@ -54,7 +54,7 @@ export function AppSidebar() {
   const isActive = (path: string) => currentPath === path || (path === "/dashboard" && currentPath === "/");
 
   return (
-    <Sidebar className={`${isCollapsed ? "w-16" : "w-64"} bg-white border-r border-gray-200`} collapsible="icon">
+    <Sidebar className="w-64 bg-white border-r border-gray-200" collapsible="none">
       <SidebarContent className="p-4">
         <SidebarGroup>
           <SidebarGroupContent>
@@ -65,20 +65,16 @@ export function AppSidebar() {
                     <NavLink
                       to={item.url}
                       className={({ isActive: navIsActive }) =>
-                        `flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group ${
+                        `flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group w-full ${
                           isActive(item.url) || navIsActive
                             ? "bg-primary text-white shadow-md"
                             : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         }`
                       }
                     >
-                      <item.icon className={`h-5 w-5 ${isCollapsed ? "mx-auto" : ""}`} />
-                      {!isCollapsed && (
-                        <>
-                          <span className="flex-1 text-sm font-medium">{item.title}</span>
-                          <ChevronRight className="h-4 w-4 opacity-50 group-hover:opacity-100" />
-                        </>
-                      )}
+                      <item.icon className="h-5 w-5 flex-shrink-0" />
+                      <span className="flex-1 text-sm font-medium">{item.title}</span>
+                      <ChevronRight className="h-4 w-4 opacity-50 group-hover:opacity-100 flex-shrink-0" />
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

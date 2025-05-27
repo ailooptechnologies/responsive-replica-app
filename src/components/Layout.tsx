@@ -1,7 +1,7 @@
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { Bell, User, Globe } from "lucide-react";
+import { Bell, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,24 +23,24 @@ const Layout = ({ children }: LayoutProps) => {
         {/* Header */}
         <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-6">
           <div className="flex items-center gap-4">
-            <SidebarTrigger className="lg:hidden" />
+            <SidebarTrigger className="md:hidden" />
             <div className="flex items-center gap-2">
               <div className="text-2xl font-bold">
                 <span className="text-black">ERP</span>
                 <span className="text-primary">GO</span>
               </div>
-              <span className="text-xs text-gray-500">Powered by WORKDO</span>
+              <span className="text-xs text-gray-500 hidden sm:block">Powered by WORKDO</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" className="text-gray-600">
+          <div className="flex items-center gap-2 lg:gap-4">
+            <Button variant="ghost" size="sm" className="text-gray-600 hidden lg:inline-flex">
               Support
             </Button>
-            <Button variant="ghost" size="sm" className="text-gray-600">
+            <Button variant="ghost" size="sm" className="text-gray-600 hidden lg:inline-flex">
               Terms
             </Button>
-            <Button variant="ghost" size="sm" className="text-gray-600">
+            <Button variant="ghost" size="sm" className="text-gray-600 hidden lg:inline-flex">
               Privacy
             </Button>
             
@@ -70,7 +70,7 @@ const Layout = ({ children }: LayoutProps) => {
                   <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
                     <User className="h-4 w-4" />
                   </div>
-                  <span className="text-sm text-gray-700">Hi, company!</span>
+                  <span className="text-sm text-gray-700 hidden sm:block">Hi, company!</span>
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
@@ -79,10 +79,6 @@ const Layout = ({ children }: LayoutProps) => {
                 <DropdownMenuItem>Logout</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-
-            <Button variant="outline" size="sm" className="text-gray-600">
-              EN
-            </Button>
           </div>
         </header>
 
