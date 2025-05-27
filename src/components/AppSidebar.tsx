@@ -46,14 +46,15 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
-  const { collapsed } = useSidebar();
+  const { state } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
 
+  const isCollapsed = state === "collapsed";
   const isActive = (path: string) => currentPath === path || (path === "/dashboard" && currentPath === "/");
 
   return (
-    <Sidebar className={`${collapsed ? "w-16" : "w-64"} bg-white border-r border-gray-200`} collapsible>
+    <Sidebar className={`${isCollapsed ? "w-16" : "w-64"} bg-white border-r border-gray-200`} collapsible="icon">
       <SidebarContent className="p-4">
         <SidebarGroup>
           <SidebarGroupContent>
@@ -71,8 +72,8 @@ export function AppSidebar() {
                         }`
                       }
                     >
-                      <item.icon className={`h-5 w-5 ${collapsed ? "mx-auto" : ""}`} />
-                      {!collapsed && (
+                      <item.icon className={`h-5 w-5 ${isCollapsed ? "mx-auto" : ""}`} />
+                      {!isCollapsed && (
                         <>
                           <span className="flex-1 text-sm font-medium">{item.title}</span>
                           <ChevronRight className="h-4 w-4 opacity-50 group-hover:opacity-100" />
