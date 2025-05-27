@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
@@ -51,7 +50,7 @@ const Dashboard = () => {
       {/* Breadcrumb */}
       <div className="flex items-center space-x-2 text-sm text-gray-500">
         <span>Dashboard</span>
-        <span>></span>
+        <span>&gt;</span>
         <span>Project</span>
       </div>
 
