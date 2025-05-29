@@ -81,7 +81,7 @@ export function AppSidebar() {
             className={({ isActive: navIsActive }) =>
               `flex items-center gap-3 px-6 py-2 rounded-lg transition-all duration-200 w-full text-left ml-4 ${
                 isActive(item.url) || navIsActive
-                  ? "bg-primary text-white shadow-md"
+                  ? "bg-primary shadow-md"
                   : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
               }`
             }
