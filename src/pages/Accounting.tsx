@@ -1,12 +1,34 @@
-
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { DollarSign, TrendingUp, TrendingDown, FileText, Plus, Search } from "lucide-react";
+import { DollarSign, TrendingUp, TrendingDown, FileText, Plus, Search, Download, Edit, Eye } from "lucide-react";
+import { InvoiceModal } from "@/components/InvoiceModal";
+import { ExpenseModal } from "@/components/ExpenseModal";
+import { exportToCSV, exportToExcel } from "@/utils/exportUtils";
 
 const Accounting = () => {
+  const [invoices, setInvoices] = useState([
+    { id: "INV-001", client: "ACME Corp", amount: "$5,200", status: "Paid", date: "2025-01-15", description: "Web development services" },
+    { id: "INV-002", client: "Tech Solutions", amount: "$3,400", status: "Pending", date: "2025-01-20", description: "Consulting services" },
+    { id: "INV-003", client: "Global Industries", amount: "$7,800", status: "Overdue", date: "2025-01-10", description: "Software licensing" },
+    { id: "INV-004", client: "StartupXYZ", amount: "$2,100", status: "Draft", date: "2025-01-25", description: "Mobile app development" },
+  ]);
+
+  const [expenses, setExpenses] = useState([
+    { id: "EXP-001", category: "Office Supplies", amount: "$500", date: "2025-01-15", description: "Stationery and equipment" },
+    { id: "EXP-002", category: "Marketing", amount: "$1,200", date: "2025-01-18", description: "Social media advertising" },
+    { id: "EXP-003", category: "Utilities", amount: "$800", date: "2025-01-20", description: "Electricity and internet" },
+  ]);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+  const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [selectedExpense, setSelectedExpense] = useState(null);
+
   const financialStats = [
     {
       title: "Total Revenue",
@@ -59,18 +81,45 @@ const Accounting = () => {
     { name: "Others", value: 10, color: "#ffd93d" },
   ];
 
-  const invoices = [
-    { id: "INV-001", client: "ACME Corp", amount: "$5,200", status: "Paid", date: "2025-01-15" },
-    { id: "INV-002", client: "Tech Solutions", amount: "$3,400", status: "Pending", date: "2025-01-20" },
-    { id: "INV-003", client: "Global Industries", amount: "$7,800", status: "Overdue", date: "2025-01-10" },
-    { id: "INV-004", client: "StartupXYZ", amount: "$2,100", status: "Draft", date: "2025-01-25" },
-  ];
+  const filteredInvoices = invoices.filter(invoice =>
+    invoice.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    invoice.id.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleInvoiceSave = (invoice) => {
+    if (selectedInvoice) {
+      setInvoices(invoices.map(inv => inv.id === invoice.id ? invoice : inv));
+    } else {
+      setInvoices([...invoices, invoice]);
+    }
+    setSelectedInvoice(null);
+  };
+
+  const handleExpenseSave = (expense) => {
+    if (selectedExpense) {
+      setExpenses(expenses.map(exp => exp.id === expense.id ? expense : exp));
+    } else {
+      setExpenses([...expenses, expense]);
+    }
+    setSelectedExpense(null);
+  };
+
+  const handleExportReport = (type, format) => {
+    const data = type === 'invoices' ? invoices : expenses;
+    const filename = `${type}_report_${new Date().toISOString().split('T')[0]}`;
+    
+    if (format === 'csv') {
+      exportToCSV(data, filename);
+    } else {
+      exportToExcel(data, filename);
+    }
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900">Accounting</h1>
-        <Button className="bg-primary hover:bg-primary/90">
+        <Button className="bg-primary hover:bg-primary/90" onClick={() => setIsInvoiceModalOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
           New Invoice
         </Button>
@@ -115,7 +164,6 @@ const Accounting = () => {
 
         <TabsContent value="overview" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Revenue vs Expenses Chart */}
             <Card className="border-0 shadow-lg">
               <CardHeader>
                 <CardTitle>Revenue vs Expenses</CardTitle>
@@ -133,7 +181,6 @@ const Accounting = () => {
               </CardContent>
             </Card>
 
-            {/* Expense Categories */}
             <Card className="border-0 shadow-lg">
               <CardHeader>
                 <CardTitle>Expense Categories</CardTitle>
@@ -182,9 +229,14 @@ const Accounting = () => {
                 <div className="flex items-center space-x-2">
                   <div className="relative">
                     <Search className="h-4 w-4 absolute left-3 top-3 text-gray-400" />
-                    <Input placeholder="Search invoices..." className="pl-10" />
+                    <Input 
+                      placeholder="Search invoices..." 
+                      className="pl-10"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
                   </div>
-                  <Button className="bg-primary hover:bg-primary/90">
+                  <Button className="bg-primary hover:bg-primary/90" onClick={() => setIsInvoiceModalOpen(true)}>
                     <Plus className="h-4 w-4 mr-2" />
                     Add Invoice
                   </Button>
@@ -205,7 +257,7 @@ const Accounting = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {invoices.map((invoice, index) => (
+                    {filteredInvoices.map((invoice, index) => (
                       <tr key={index} className="border-b hover:bg-gray-50">
                         <td className="py-3 px-4 font-medium">{invoice.id}</td>
                         <td className="py-3 px-4">{invoice.client}</td>
@@ -223,8 +275,15 @@ const Accounting = () => {
                         <td className="py-3 px-4">{invoice.date}</td>
                         <td className="py-3 px-4">
                           <div className="flex space-x-2">
-                            <Button variant="outline" size="sm">View</Button>
-                            <Button variant="outline" size="sm">Edit</Button>
+                            <Button variant="outline" size="sm" onClick={() => console.log('View invoice:', invoice.id)}>
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={() => {
+                              setSelectedInvoice(invoice);
+                              setIsInvoiceModalOpen(true);
+                            }}>
+                              <Edit className="h-4 w-4" />
+                            </Button>
                           </div>
                         </td>
                       </tr>
@@ -241,17 +300,50 @@ const Accounting = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Expense Management</CardTitle>
-                <Button className="bg-primary hover:bg-primary/90">
+                <Button className="bg-primary hover:bg-primary/90" onClick={() => setIsExpenseModalOpen(true)}>
                   <Plus className="h-4 w-4 mr-2" />
                   Add Expense
                 </Button>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12 text-gray-500">
-                <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                <p>No expenses recorded yet.</p>
-                <p className="text-sm">Start tracking your business expenses.</p>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-3 px-4">Expense ID</th>
+                      <th className="text-left py-3 px-4">Category</th>
+                      <th className="text-left py-3 px-4">Amount</th>
+                      <th className="text-left py-3 px-4">Date</th>
+                      <th className="text-left py-3 px-4">Description</th>
+                      <th className="text-left py-3 px-4">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {expenses.map((expense, index) => (
+                      <tr key={index} className="border-b hover:bg-gray-50">
+                        <td className="py-3 px-4 font-medium">{expense.id}</td>
+                        <td className="py-3 px-4">{expense.category}</td>
+                        <td className="py-3 px-4 font-medium">{expense.amount}</td>
+                        <td className="py-3 px-4">{expense.date}</td>
+                        <td className="py-3 px-4">{expense.description}</td>
+                        <td className="py-3 px-4">
+                          <div className="flex space-x-2">
+                            <Button variant="outline" size="sm" onClick={() => console.log('View expense:', expense.id)}>
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={() => {
+                              setSelectedExpense(expense);
+                              setIsExpenseModalOpen(true);
+                            }}>
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </CardContent>
           </Card>
@@ -264,35 +356,79 @@ const Accounting = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <Button variant="outline" className="h-24 flex flex-col items-center justify-center">
-                  <FileText className="h-6 w-6 mb-2" />
-                  Profit & Loss
-                </Button>
-                <Button variant="outline" className="h-24 flex flex-col items-center justify-center">
-                  <FileText className="h-6 w-6 mb-2" />
-                  Balance Sheet
-                </Button>
-                <Button variant="outline" className="h-24 flex flex-col items-center justify-center">
-                  <FileText className="h-6 w-6 mb-2" />
-                  Cash Flow
-                </Button>
-                <Button variant="outline" className="h-24 flex flex-col items-center justify-center">
-                  <FileText className="h-6 w-6 mb-2" />
-                  Tax Report
-                </Button>
-                <Button variant="outline" className="h-24 flex flex-col items-center justify-center">
-                  <FileText className="h-6 w-6 mb-2" />
-                  Invoice Report
-                </Button>
-                <Button variant="outline" className="h-24 flex flex-col items-center justify-center">
-                  <FileText className="h-6 w-6 mb-2" />
-                  Expense Report
-                </Button>
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center">
+                      <FileText className="h-6 w-6 mb-2" />
+                      <span className="ml-2 font-medium">Invoice Report</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => handleExportReport('invoices', 'csv')}>
+                      <Download className="h-4 w-4 mr-1" /> CSV
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => handleExportReport('invoices', 'excel')}>
+                      <Download className="h-4 w-4 mr-1" /> Excel
+                    </Button>
+                  </div>
+                </div>
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center">
+                      <FileText className="h-6 w-6 mb-2" />
+                      <span className="ml-2 font-medium">Expense Report</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => handleExportReport('expenses', 'csv')}>
+                      <Download className="h-4 w-4 mr-1" /> CSV
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => handleExportReport('expenses', 'excel')}>
+                      <Download className="h-4 w-4 mr-1" /> Excel
+                    </Button>
+                  </div>
+                </div>
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center">
+                      <FileText className="h-6 w-6 mb-2" />
+                      <span className="ml-2 font-medium">P&L Report</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => handleExportReport('profit-loss', 'csv')}>
+                      <Download className="h-4 w-4 mr-1" /> CSV
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => handleExportReport('profit-loss', 'excel')}>
+                      <Download className="h-4 w-4 mr-1" /> Excel
+                    </Button>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
+
+      <InvoiceModal
+        isOpen={isInvoiceModalOpen}
+        onClose={() => {
+          setIsInvoiceModalOpen(false);
+          setSelectedInvoice(null);
+        }}
+        invoice={selectedInvoice}
+        onSave={handleInvoiceSave}
+      />
+
+      <ExpenseModal
+        isOpen={isExpenseModalOpen}
+        onClose={() => {
+          setIsExpenseModalOpen(false);
+          setSelectedExpense(null);
+        }}
+        expense={selectedExpense}
+        onSave={handleExpenseSave}
+      />
     </div>
   );
 };
