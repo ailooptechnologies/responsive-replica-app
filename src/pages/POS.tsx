@@ -3,18 +3,22 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ShoppingCart, Plus, Minus, Search } from "lucide-react";
+import { ShoppingCart, Plus, Minus, Search, Package, Edit, Eye, Trash2 } from "lucide-react";
+import { ProductModal } from "@/components/ProductModal";
 
 const POS = () => {
   const [cart, setCart] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showProducts, setShowProducts] = useState(false);
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
-  const products = [
+  const [products, setProducts] = useState([
     { id: 1, name: "Product A", price: 29.99, stock: 50 },
     { id: 2, name: "Product B", price: 19.99, stock: 30 },
     { id: 3, name: "Product C", price: 39.99, stock: 25 },
     { id: 4, name: "Product D", price: 15.99, stock: 40 },
-  ];
+  ]);
 
   const addToCart = (product: any) => {
     const existingItem = cart.find(item => item.id === product.id);
@@ -45,6 +49,19 @@ const POS = () => {
     }
   };
 
+  const handleProductSave = (product) => {
+    if (selectedProduct) {
+      setProducts(products.map(prod => prod.id === product.id ? product : prod));
+    } else {
+      setProducts([...products, product]);
+    }
+    setSelectedProduct(null);
+  };
+
+  const handleDeleteProduct = (productId) => {
+    setProducts(products.filter(prod => prod.id !== productId));
+  };
+
   const getTotal = () => {
     return cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
   };
@@ -60,18 +77,112 @@ const POS = () => {
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  if (showProducts) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold text-gray-900">Product Management</h1>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setShowProducts(false)}>
+              Back to POS
+            </Button>
+            <Button className="bg-primary hover:bg-primary/90" onClick={() => setIsProductModalOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Product
+            </Button>
+          </div>
+        </div>
+
+        <Card className="border-0 shadow-lg">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Products</CardTitle>
+              <div className="relative">
+                <Search className="h-4 w-4 absolute left-3 top-3 text-gray-400" />
+                <Input 
+                  placeholder="Search products..." 
+                  className="pl-10"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-3 px-4">Product ID</th>
+                    <th className="text-left py-3 px-4">Name</th>
+                    <th className="text-left py-3 px-4">Price</th>
+                    <th className="text-left py-3 px-4">Stock</th>
+                    <th className="text-left py-3 px-4">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredProducts.map((product) => (
+                    <tr key={product.id} className="border-b hover:bg-gray-50">
+                      <td className="py-3 px-4 font-medium">#{product.id}</td>
+                      <td className="py-3 px-4">{product.name}</td>
+                      <td className="py-3 px-4 font-medium">${product.price}</td>
+                      <td className="py-3 px-4">{product.stock}</td>
+                      <td className="py-3 px-4">
+                        <div className="flex space-x-2">
+                          <Button variant="outline" size="sm" onClick={() => {
+                            setSelectedProduct(product);
+                            setIsProductModalOpen(true);
+                          }}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="outline" size="sm" onClick={() => handleDeleteProduct(product.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+
+        <ProductModal
+          isOpen={isProductModalOpen}
+          onClose={() => {
+            setIsProductModalOpen(false);
+            setSelectedProduct(null);
+          }}
+          product={selectedProduct}
+          onSave={handleProductSave}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900">POS System</h1>
-        <Button 
-          onClick={() => setCart([])}
-          variant="outline"
-          className="border-primary text-primary hover:bg-primary hover:text-white"
-        >
-          <ShoppingCart className="h-4 w-4 mr-2" />
-          Clear Cart
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={() => setShowProducts(true)}
+            variant="outline"
+            className="border-primary text-primary hover:bg-primary hover:text-white"
+          >
+            <Package className="h-4 w-4 mr-2" />
+            Manage Products
+          </Button>
+          <Button 
+            onClick={() => setCart([])}
+            variant="outline"
+            className="border-primary text-primary hover:bg-primary hover:text-white"
+          >
+            <ShoppingCart className="h-4 w-4 mr-2" />
+            Clear Cart
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

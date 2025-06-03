@@ -4,8 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Truck, Plus, Search, Edit, Eye, Trash2 } from "lucide-react";
 import { SupplierModal } from "@/components/SupplierModal";
+import { ViewSupplierModal } from "@/components/ViewSupplierModal";
 
 const SupplyChain = () => {
   const [suppliers, setSuppliers] = useState([
@@ -31,6 +33,7 @@ const SupplyChain = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
 
   const filteredSuppliers = suppliers.filter(supplier =>
@@ -105,19 +108,38 @@ const SupplyChain = () => {
                     <td className="py-3 px-4">{supplier.phone}</td>
                     <td className="py-3 px-4">{supplier.category}</td>
                     <td className="py-3 px-4">
-                      <select 
-                        value={supplier.status}
-                        onChange={(e) => handleStatusChange(supplier.id, e.target.value)}
-                        className="text-xs px-2 py-1 rounded border"
-                      >
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                        <option value="Pending">Pending</option>
-                      </select>
+                      <Select value={supplier.status} onValueChange={(value) => handleStatusChange(supplier.id, value)}>
+                        <SelectTrigger className="w-32">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Active">
+                            <div className="flex items-center">
+                              <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                              Active
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="Inactive">
+                            <div className="flex items-center">
+                              <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
+                              Inactive
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="Pending">
+                            <div className="flex items-center">
+                              <div className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></div>
+                              Pending
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex space-x-2">
-                        <Button variant="outline" size="sm" onClick={() => console.log('View supplier:', supplier.id)}>
+                        <Button variant="outline" size="sm" onClick={() => {
+                          setSelectedSupplier(supplier);
+                          setIsViewModalOpen(true);
+                        }}>
                           <Eye className="h-4 w-4" />
                         </Button>
                         <Button variant="outline" size="sm" onClick={() => {
@@ -147,6 +169,15 @@ const SupplyChain = () => {
         }}
         supplier={selectedSupplier}
         onSave={handleSupplierSave}
+      />
+
+      <ViewSupplierModal
+        isOpen={isViewModalOpen}
+        onClose={() => {
+          setIsViewModalOpen(false);
+          setSelectedSupplier(null);
+        }}
+        supplier={selectedSupplier}
       />
     </div>
   );

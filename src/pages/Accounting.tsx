@@ -3,10 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { DollarSign, TrendingUp, TrendingDown, FileText, Plus, Search, Download, Edit, Eye } from "lucide-react";
 import { InvoiceModal } from "@/components/InvoiceModal";
 import { ExpenseModal } from "@/components/ExpenseModal";
+import { ViewInvoiceModal } from "@/components/ViewInvoiceModal";
+import { ViewExpenseModal } from "@/components/ViewExpenseModal";
 import { exportToCSV, exportToExcel } from "@/utils/exportUtils";
 
 const Accounting = () => {
@@ -26,6 +29,8 @@ const Accounting = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+  const [isViewInvoiceModalOpen, setIsViewInvoiceModalOpen] = useState(false);
+  const [isViewExpenseModalOpen, setIsViewExpenseModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [selectedExpense, setSelectedExpense] = useState(null);
 
@@ -102,6 +107,12 @@ const Accounting = () => {
       setExpenses([...expenses, expense]);
     }
     setSelectedExpense(null);
+  };
+
+  const handleInvoiceStatusChange = (invoiceId, newStatus) => {
+    setInvoices(invoices.map(inv => 
+      inv.id === invoiceId ? { ...inv, status: newStatus } : inv
+    ));
   };
 
   const handleExportReport = (type, format) => {
@@ -263,19 +274,25 @@ const Accounting = () => {
                         <td className="py-3 px-4">{invoice.client}</td>
                         <td className="py-3 px-4 font-medium">{invoice.amount}</td>
                         <td className="py-3 px-4">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            invoice.status === "Paid" ? "bg-green-100 text-green-800" :
-                            invoice.status === "Pending" ? "bg-yellow-100 text-yellow-800" :
-                            invoice.status === "Overdue" ? "bg-red-100 text-red-800" :
-                            "bg-gray-100 text-gray-800"
-                          }`}>
-                            {invoice.status}
-                          </span>
+                          <Select value={invoice.status} onValueChange={(value) => handleInvoiceStatusChange(invoice.id, value)}>
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Draft">Draft</SelectItem>
+                              <SelectItem value="Pending">Pending</SelectItem>
+                              <SelectItem value="Paid">Paid</SelectItem>
+                              <SelectItem value="Overdue">Overdue</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </td>
                         <td className="py-3 px-4">{invoice.date}</td>
                         <td className="py-3 px-4">
                           <div className="flex space-x-2">
-                            <Button variant="outline" size="sm" onClick={() => console.log('View invoice:', invoice.id)}>
+                            <Button variant="outline" size="sm" onClick={() => {
+                              setSelectedInvoice(invoice);
+                              setIsViewInvoiceModalOpen(true);
+                            }}>
                               <Eye className="h-4 w-4" />
                             </Button>
                             <Button variant="outline" size="sm" onClick={() => {
@@ -329,7 +346,10 @@ const Accounting = () => {
                         <td className="py-3 px-4">{expense.description}</td>
                         <td className="py-3 px-4">
                           <div className="flex space-x-2">
-                            <Button variant="outline" size="sm" onClick={() => console.log('View expense:', expense.id)}>
+                            <Button variant="outline" size="sm" onClick={() => {
+                              setSelectedExpense(expense);
+                              setIsViewExpenseModalOpen(true);
+                            }}>
                               <Eye className="h-4 w-4" />
                             </Button>
                             <Button variant="outline" size="sm" onClick={() => {
@@ -428,6 +448,24 @@ const Accounting = () => {
         }}
         expense={selectedExpense}
         onSave={handleExpenseSave}
+      />
+
+      <ViewInvoiceModal
+        isOpen={isViewInvoiceModalOpen}
+        onClose={() => {
+          setIsViewInvoiceModalOpen(false);
+          setSelectedInvoice(null);
+        }}
+        invoice={selectedInvoice}
+      />
+
+      <ViewExpenseModal
+        isOpen={isViewExpenseModalOpen}
+        onClose={() => {
+          setIsViewExpenseModalOpen(false);
+          setSelectedExpense(null);
+        }}
+        expense={selectedExpense}
       />
     </div>
   );
