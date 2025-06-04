@@ -1,4 +1,4 @@
-
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/hooks/use-toast";
+import { ProfileModal } from "./ProfileModal";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -18,6 +19,7 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   const navigate = useNavigate();
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   const handleLogout = () => {
     toast({
@@ -49,10 +51,7 @@ const Layout = ({ children }: LayoutProps) => {
   };
 
   const handleProfile = () => {
-    toast({
-      title: "Profile",
-      description: "Opening user profile...",
-    });
+    setIsProfileModalOpen(true);
   };
 
   const handleSettings = () => {
@@ -146,7 +145,7 @@ const Layout = ({ children }: LayoutProps) => {
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem onClick={handleProfile}>Profile</DropdownMenuItem>
-                <DropdownMenuItem onClick={handleSettings}>Settings</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/settings")}>Settings</DropdownMenuItem>
                 <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -158,6 +157,11 @@ const Layout = ({ children }: LayoutProps) => {
           {children}
         </main>
       </div>
+
+      <ProfileModal 
+        isOpen={isProfileModalOpen} 
+        onClose={() => setIsProfileModalOpen(false)} 
+      />
     </div>
   );
 };

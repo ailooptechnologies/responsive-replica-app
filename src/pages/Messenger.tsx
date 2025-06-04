@@ -4,7 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageCircle, Send, User } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { MessageCircle, Send, User, Plus } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 const Messenger = () => {
   const [messages, setMessages] = useState([
@@ -13,13 +16,15 @@ const Messenger = () => {
   ]);
   const [newMessage, setNewMessage] = useState("");
   const [selectedContact, setSelectedContact] = useState("John Doe");
+  const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
+  const [newChatData, setNewChatData] = useState({ name: "", email: "" });
 
-  const contacts = [
+  const [contacts, setContacts] = useState([
     { name: "John Doe", status: "online", lastSeen: "now" },
     { name: "Jane Smith", status: "offline", lastSeen: "2 hours ago" },
     { name: "Mike Johnson", status: "online", lastSeen: "now" },
     { name: "Sarah Wilson", status: "away", lastSeen: "30 mins ago" },
-  ];
+  ]);
 
   const sendMessage = () => {
     if (newMessage.trim()) {
@@ -42,11 +47,41 @@ const Messenger = () => {
     }
   };
 
+  const handleNewChat = () => {
+    if (!newChatData.name || !newChatData.email) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const newContact = {
+      name: newChatData.name,
+      status: "offline",
+      lastSeen: "just added"
+    };
+
+    setContacts([...contacts, newContact]);
+    setSelectedContact(newContact.name);
+    setNewChatData({ name: "", email: "" });
+    setIsNewChatModalOpen(false);
+    
+    toast({
+      title: "New Chat Created",
+      description: `Started a new conversation with ${newContact.name}`,
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900">Messenger</h1>
-        <Button className="bg-primary hover:bg-primary/90">
+        <Button 
+          className="bg-primary hover:bg-primary/90"
+          onClick={() => setIsNewChatModalOpen(true)}
+        >
           <MessageCircle className="h-4 w-4 mr-2" />
           New Chat
         </Button>
@@ -148,6 +183,46 @@ const Messenger = () => {
           </Card>
         </div>
       </div>
+
+      {/* New Chat Modal */}
+      <Dialog open={isNewChatModalOpen} onOpenChange={setIsNewChatModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Plus className="h-5 w-5" />
+              Start New Chat
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="contactName">Contact Name</Label>
+              <Input
+                id="contactName"
+                value={newChatData.name}
+                onChange={(e) => setNewChatData({...newChatData, name: e.target.value})}
+                placeholder="Enter contact name"
+              />
+            </div>
+            <div>
+              <Label htmlFor="contactEmail">Email Address</Label>
+              <Input
+                id="contactEmail"
+                type="email"
+                value={newChatData.email}
+                onChange={(e) => setNewChatData({...newChatData, email: e.target.value})}
+                placeholder="Enter email address"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={handleNewChat} className="bg-primary hover:bg-primary/90">
+                <Plus className="h-4 w-4 mr-2" />
+                Start Chat
+              </Button>
+              <Button variant="outline" onClick={() => setIsNewChatModalOpen(false)}>Cancel</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
