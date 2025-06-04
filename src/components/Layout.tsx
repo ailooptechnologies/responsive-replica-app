@@ -89,30 +89,7 @@ const Layout = ({ children }: LayoutProps) => {
           </div>
 
           <div className="flex items-center gap-2 lg:gap-4">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-gray-600 hidden lg:inline-flex"
-              onClick={handleSupport}
-            >
-              Support
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-gray-600 hidden lg:inline-flex"
-              onClick={handleTerms}
-            >
-              Terms
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-gray-600 hidden lg:inline-flex"
-              onClick={handlePrivacy}
-            >
-              Privacy
-            </Button>
+            
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
