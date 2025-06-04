@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,9 @@ import { EditEmployeeModal } from "@/components/EditEmployeeModal";
 import { ViewEmployeeModal } from "@/components/ViewEmployeeModal";
 import { DepartmentModal } from "@/components/DepartmentModal";
 import { ViewDepartmentModal } from "@/components/ViewDepartmentModal";
+import { ViewLeaveRequestModal } from "@/components/ViewLeaveRequestModal";
+import { EditLeaveRequestModal } from "@/components/EditLeaveRequestModal";
+import { ViewPayrollModal } from "@/components/ViewPayrollModal";
 import { useToast } from "@/hooks/use-toast";
 
 const HRM = () => {
@@ -130,6 +132,15 @@ const HRM = () => {
   const [viewDepartmentModal, setViewDepartmentModal] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [departmentMode, setDepartmentMode] = useState<'add' | 'edit'>('add');
+
+  // Leave Request Modal States
+  const [viewLeaveModal, setViewLeaveModal] = useState(false);
+  const [editLeaveModal, setEditLeaveModal] = useState(false);
+  const [selectedLeaveRequest, setSelectedLeaveRequest] = useState(null);
+
+  // Payroll Modal States
+  const [viewPayrollModal, setViewPayrollModal] = useState(false);
+  const [selectedPayroll, setSelectedPayroll] = useState(null);
 
   // Leave Request Form State
   const [leaveForm, setLeaveForm] = useState({
@@ -261,6 +272,16 @@ const HRM = () => {
     });
   };
 
+  const handleUpdateLeaveRequest = (updatedRequest: any) => {
+    setLeaveRequests(leaveRequests.map(req => 
+      req.id === updatedRequest.id ? updatedRequest : req
+    ));
+    toast({
+      title: "Success",
+      description: "Leave request updated successfully",
+    });
+  };
+
   // Payroll Functions
   const handlePayrollStatusChange = (payrollId: number, newStatus: string) => {
     setPayrollData(payrollData.map(payroll => 
@@ -269,6 +290,16 @@ const HRM = () => {
     toast({
       title: "Success",
       description: "Payroll status updated",
+    });
+  };
+
+  const handleProcessPayroll = (payrollId: number) => {
+    setPayrollData(payrollData.map(payroll => 
+      payroll.id === payrollId ? { ...payroll, status: "Processed" } : payroll
+    ));
+    toast({
+      title: "Success",
+      description: "Payroll processed successfully",
     });
   };
 
@@ -588,7 +619,28 @@ const HRM = () => {
                             </Select>
                           </td>
                           <td className="py-3 px-4">
-                            <Button variant="outline" size="sm">View</Button>
+                            <div className="flex space-x-2">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedLeaveRequest(request);
+                                  setViewLeaveModal(true);
+                                }}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedLeaveRequest(request);
+                                  setEditLeaveModal(true);
+                                }}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -668,8 +720,24 @@ const HRM = () => {
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex space-x-2">
-                            <Button variant="outline" size="sm">View</Button>
-                            <Button variant="outline" size="sm">Process</Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => {
+                                setSelectedPayroll(payroll);
+                                setViewPayrollModal(true);
+                              }}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleProcessPayroll(payroll.id)}
+                              disabled={payroll.status === "Processed"}
+                            >
+                              Process
+                            </Button>
                           </div>
                         </td>
                       </tr>
@@ -812,6 +880,25 @@ const HRM = () => {
         isOpen={viewDepartmentModal}
         onClose={() => setViewDepartmentModal(false)}
         department={selectedDepartment}
+      />
+
+      <ViewLeaveRequestModal
+        isOpen={viewLeaveModal}
+        onClose={() => setViewLeaveModal(false)}
+        leaveRequest={selectedLeaveRequest}
+      />
+
+      <EditLeaveRequestModal
+        isOpen={editLeaveModal}
+        onClose={() => setEditLeaveModal(false)}
+        onUpdate={handleUpdateLeaveRequest}
+        leaveRequest={selectedLeaveRequest}
+      />
+
+      <ViewPayrollModal
+        isOpen={viewPayrollModal}
+        onClose={() => setViewPayrollModal(false)}
+        payroll={selectedPayroll}
       />
     </div>
   );
