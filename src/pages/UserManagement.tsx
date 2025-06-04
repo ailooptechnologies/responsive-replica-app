@@ -4,8 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Shield, Plus, Search, Eye, Edit, Trash2 } from "lucide-react";
 import { UserModal } from "@/components/UserModal";
+import { ViewUserModal } from "@/components/ViewUserModal";
 import { toast } from "@/hooks/use-toast";
 
 const UserManagement = () => {
@@ -28,7 +30,9 @@ const UserManagement = () => {
     },
   ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [viewingUser, setViewingUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredUsers = users.filter(user =>
@@ -50,12 +54,28 @@ const UserManagement = () => {
     setIsModalOpen(true);
   };
 
+  const handleViewUser = (user: any) => {
+    setViewingUser(user);
+    setIsViewModalOpen(true);
+  };
+
   const handleDeleteUser = (userId: number) => {
     const userToDelete = users.find(user => user.id === userId);
     setUsers(users.filter(user => user.id !== userId));
     toast({
       title: "User Deleted",
       description: `User ${userToDelete?.name} has been deleted successfully.`,
+    });
+  };
+
+  const handleStatusChange = (userId: number, newStatus: string) => {
+    setUsers(users.map(user => 
+      user.id === userId ? { ...user, status: newStatus } : user
+    ));
+    const user = users.find(u => u.id === userId);
+    toast({
+      title: "Status Updated",
+      description: `${user?.name}'s status has been changed to ${newStatus}.`,
     });
   };
 
@@ -121,12 +141,28 @@ const UserManagement = () => {
                     <td className="py-3 px-4">{user.email}</td>
                     <td className="py-3 px-4">{user.role}</td>
                     <td className="py-3 px-4">
-                      <Badge className={getStatusColor(user.status)}>{user.status}</Badge>
+                      <Select
+                        value={user.status}
+                        onValueChange={(value) => handleStatusChange(user.id, value)}
+                      >
+                        <SelectTrigger className="w-32">
+                          <Badge className={getStatusColor(user.status)}>{user.status}</Badge>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Active">Active</SelectItem>
+                          <SelectItem value="Inactive">Inactive</SelectItem>
+                          <SelectItem value="Suspended">Suspended</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </td>
                     <td className="py-3 px-4">{user.lastLogin}</td>
                     <td className="py-3 px-4">
                       <div className="flex space-x-2">
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleViewUser(user)}
+                        >
                           <Eye className="h-3 w-3 mr-1" />
                           View
                         </Button>
@@ -162,6 +198,12 @@ const UserManagement = () => {
         onClose={() => setIsModalOpen(false)}
         user={editingUser}
         onSave={handleSaveUser}
+      />
+
+      <ViewUserModal
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        user={viewingUser}
       />
     </div>
   );

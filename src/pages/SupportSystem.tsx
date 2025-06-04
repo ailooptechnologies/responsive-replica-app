@@ -4,15 +4,41 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Headphones, Plus, Search, Eye } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Headphones, Plus, Search, Eye, Edit } from "lucide-react";
 import { SupportTicketModal } from "@/components/SupportTicketModal";
+import { ViewSupportTicketModal } from "@/components/ViewSupportTicketModal";
+import { EditSupportTicketModal } from "@/components/EditSupportTicketModal";
+import { toast } from "@/hooks/use-toast";
 
 const SupportSystem = () => {
   const [tickets, setTickets] = useState([
-    { id: "TICK-001", subject: "Login Issue", priority: "High", category: "Technical", status: "Open", createdAt: "2025-01-27", assignedTo: "John Support" },
-    { id: "TICK-002", subject: "Billing Question", priority: "Medium", category: "Billing", status: "In Progress", createdAt: "2025-01-26", assignedTo: "Jane Support" },
+    { 
+      id: "TICK-001", 
+      subject: "Login Issue", 
+      priority: "High", 
+      category: "Technical", 
+      status: "Open", 
+      createdAt: "2025-01-27", 
+      assignedTo: "John Support",
+      description: "User unable to login with correct credentials. Getting error message 'Invalid login'."
+    },
+    { 
+      id: "TICK-002", 
+      subject: "Billing Question", 
+      priority: "Medium", 
+      category: "Billing", 
+      status: "In Progress", 
+      createdAt: "2025-01-26", 
+      assignedTo: "Jane Support",
+      description: "Customer inquiry about subscription charges appearing twice on their statement."
+    },
   ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [viewingTicket, setViewingTicket] = useState(null);
+  const [editingTicket, setEditingTicket] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredTickets = tickets.filter(ticket =>
@@ -22,6 +48,33 @@ const SupportSystem = () => {
 
   const handleSaveTicket = (newTicket: any) => {
     setTickets([...tickets, newTicket]);
+  };
+
+  const handleUpdateTicket = (updatedTicket: any) => {
+    setTickets(tickets.map(ticket => 
+      ticket.id === updatedTicket.id ? updatedTicket : ticket
+    ));
+  };
+
+  const handleViewTicket = (ticket: any) => {
+    setViewingTicket(ticket);
+    setIsViewModalOpen(true);
+  };
+
+  const handleEditTicket = (ticket: any) => {
+    setEditingTicket(ticket);
+    setIsEditModalOpen(true);
+  };
+
+  const handleStatusChange = (ticketId: string, newStatus: string) => {
+    setTickets(tickets.map(ticket => 
+      ticket.id === ticketId ? { ...ticket, status: newStatus } : ticket
+    ));
+    const ticket = tickets.find(t => t.id === ticketId);
+    toast({
+      title: "Status Updated",
+      description: `Ticket ${ticket?.id} status has been changed to ${newStatus}.`,
+    });
   };
 
   const getStatusColor = (status: string) => {
@@ -95,17 +148,41 @@ const SupportSystem = () => {
                       <Badge className={getPriorityColor(ticket.priority)}>{ticket.priority}</Badge>
                     </td>
                     <td className="py-3 px-4">
-                      <Badge className={getStatusColor(ticket.status)}>{ticket.status}</Badge>
+                      <Select
+                        value={ticket.status}
+                        onValueChange={(value) => handleStatusChange(ticket.id, value)}
+                      >
+                        <SelectTrigger className="w-32">
+                          <Badge className={getStatusColor(ticket.status)}>{ticket.status}</Badge>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Open">Open</SelectItem>
+                          <SelectItem value="In Progress">In Progress</SelectItem>
+                          <SelectItem value="Resolved">Resolved</SelectItem>
+                          <SelectItem value="Closed">Closed</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </td>
                     <td className="py-3 px-4">{ticket.createdAt}</td>
                     <td className="py-3 px-4">{ticket.assignedTo}</td>
                     <td className="py-3 px-4">
                       <div className="flex space-x-2">
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleViewTicket(ticket)}
+                        >
                           <Eye className="h-3 w-3 mr-1" />
                           View
                         </Button>
-                        <Button variant="outline" size="sm">Edit</Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleEditTicket(ticket)}
+                        >
+                          <Edit className="h-3 w-3 mr-1" />
+                          Edit
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -120,6 +197,19 @@ const SupportSystem = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveTicket}
+      />
+
+      <ViewSupportTicketModal
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        ticket={viewingTicket}
+      />
+
+      <EditSupportTicketModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        ticket={editingTicket}
+        onSave={handleUpdateTicket}
       />
     </div>
   );

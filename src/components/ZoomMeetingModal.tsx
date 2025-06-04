@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,10 +11,11 @@ import { toast } from "@/hooks/use-toast";
 interface ZoomMeetingModalProps {
   isOpen: boolean;
   onClose: () => void;
+  meeting?: any;
   onSave: (meeting: any) => void;
 }
 
-export function ZoomMeetingModal({ isOpen, onClose, onSave }: ZoomMeetingModalProps) {
+export function ZoomMeetingModal({ isOpen, onClose, meeting, onSave }: ZoomMeetingModalProps) {
   const [formData, setFormData] = useState({
     title: "",
     date: "",
@@ -23,6 +24,21 @@ export function ZoomMeetingModal({ isOpen, onClose, onSave }: ZoomMeetingModalPr
     participants: "",
     agenda: ""
   });
+
+  useEffect(() => {
+    if (meeting) {
+      setFormData({
+        title: meeting.title || "",
+        date: meeting.date || "",
+        time: meeting.time || "",
+        duration: meeting.duration || "60",
+        participants: meeting.participants || "",
+        agenda: meeting.agenda || ""
+      });
+    } else {
+      setFormData({ title: "", date: "", time: "", duration: "60", participants: "", agenda: "" });
+    }
+  }, [meeting]);
 
   const handleSave = () => {
     if (!formData.title || !formData.date || !formData.time) {
@@ -34,7 +50,15 @@ export function ZoomMeetingModal({ isOpen, onClose, onSave }: ZoomMeetingModalPr
       return;
     }
 
-    const newMeeting = {
+    const meetingData = meeting ? {
+      ...meeting,
+      title: formData.title,
+      date: formData.date,
+      time: formData.time,
+      duration: formData.duration,
+      participants: formData.participants,
+      agenda: formData.agenda
+    } : {
       id: `MEET-${Date.now()}`,
       title: formData.title,
       date: formData.date,
@@ -47,13 +71,15 @@ export function ZoomMeetingModal({ isOpen, onClose, onSave }: ZoomMeetingModalPr
       createdAt: new Date().toLocaleDateString()
     };
 
-    onSave(newMeeting);
-    setFormData({ title: "", date: "", time: "", duration: "60", participants: "", agenda: "" });
+    onSave(meetingData);
+    if (!meeting) {
+      setFormData({ title: "", date: "", time: "", duration: "60", participants: "", agenda: "" });
+    }
     onClose();
     
     toast({
-      title: "Meeting Scheduled",
-      description: `Zoom meeting "${newMeeting.title}" has been scheduled successfully.`,
+      title: meeting ? "Meeting Updated" : "Meeting Scheduled",
+      description: `Zoom meeting "${meetingData.title}" has been ${meeting ? "updated" : "scheduled"} successfully.`,
     });
   };
 
@@ -63,7 +89,7 @@ export function ZoomMeetingModal({ isOpen, onClose, onSave }: ZoomMeetingModalPr
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5" />
-            Schedule Zoom Meeting
+            {meeting ? "Edit Meeting" : "Schedule Zoom Meeting"}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
@@ -128,7 +154,7 @@ export function ZoomMeetingModal({ isOpen, onClose, onSave }: ZoomMeetingModalPr
           <div className="flex gap-2">
             <Button onClick={handleSave} className="bg-primary hover:bg-primary/90">
               <Calendar className="h-4 w-4 mr-2" />
-              Schedule Meeting
+              {meeting ? "Update Meeting" : "Schedule Meeting"}
             </Button>
             <Button variant="outline" onClick={onClose}>Cancel</Button>
           </div>
