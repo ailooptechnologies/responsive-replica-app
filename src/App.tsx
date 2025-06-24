@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -24,6 +23,7 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import ForgotPassword from "./pages/ForgotPassword";
 import SupplyChain from "./pages/SupplyChain";
+import FinanceAccounting from "./pages/FinanceAccounting";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +55,13 @@ const App = () => (
             <SidebarProvider>
               <Layout>
                 <Accounting />
+              </Layout>
+            </SidebarProvider>
+          } />
+          <Route path="/finance-accounting" element={
+            <SidebarProvider>
+              <Layout>
+                <FinanceAccounting />
               </Layout>
             </SidebarProvider>
           } />
