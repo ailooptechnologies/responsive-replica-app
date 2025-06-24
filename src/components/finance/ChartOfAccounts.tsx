@@ -43,7 +43,7 @@ const ChartOfAccounts = () => {
     category: '',
     parentAccount: '',
     currency: 'USD',
-    status: 'Active' as const
+    status: 'Active' as 'Active' | 'Inactive'
   });
 
   const accountTypes = ['Asset', 'Liability', 'Equity', 'Revenue', 'Expense'];

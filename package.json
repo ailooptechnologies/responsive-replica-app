@@ -41,6 +41,7 @@
     "react-dom": "^19.0.0",
     "react-fox-toast": "^1.10.20",
     "react-hook-form": "^7.53.0",
+    "react-router-dom": "^7.6.2",
     "recharts": "^2.15.3",
     "sonner": "^2.0.5",
     "swr": "^2.2.5",
